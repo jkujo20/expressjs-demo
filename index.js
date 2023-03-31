@@ -3,8 +3,6 @@ const express = require("express");
 const path = require("path");
 const app = express();
 const mysql = require("mysql");
-const logger = require("./middleware/logger");
-const auth = require("./middleware/auth");
 
 const PORT = process.env.PORT || 5000;
 
@@ -18,10 +16,10 @@ const connection = mysql.createConnection({
 connection.connect();
 
 //middle ware separate topic
-// app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(logger);
+
 
 app.listen(PORT, () => {
   console.log(`Server started in port ${PORT}...`);
@@ -67,7 +65,7 @@ app.get("/api/user/:id", (req, res) => {
 });
 
 // Post Request
-app.post("/api/user", (req, res) => {
+app.post("/api/users", (req, res) => {
   let name = req.body.name;
   let email = req.body.email;
   let password = req.body.password;
@@ -84,3 +82,33 @@ app.post("/api/user", (req, res) => {
     }
   );
 });
+
+
+app.put("/api/users", (req, res) =>{
+  const { id, name, email, password } = req.body;
+
+  connection.query("UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?", 
+  [name, email, password, id],
+  (err, result, fields) => {
+    if (err) {
+      throw err;
+    }
+    res.status(200).json({msg: "Data updated successfully"});
+  }
+  
+  );
+})
+
+app.delete("/api/users", (req, res) =>{
+  const { id } = req.body;
+
+  connection.query("DELETE FROM users WHERE id = ?", 
+  [id],
+  (err, result, fields) => {
+    if (err) {
+      throw err;
+    }
+    res.status(200).json({msg: "Data deleted successfully"});
+  }  
+  );
+})
