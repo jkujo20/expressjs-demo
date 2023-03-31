@@ -28,7 +28,7 @@ app.listen(PORT, () => {
 });
 
 // Get Request
-app.get("/api/users", auth, (req, res) => {
+app.get("/api/users", (req, res) => {
   console.log("Get Users");
   console.log(`User is admin = ${req.admin}`);
 
@@ -81,40 +81,6 @@ app.post("/api/user", (req, res) => {
       }
 
       res.status(200).json({ msg: `Data inserted with id ${result.insertId}` });
-    }
-  );
-});
-
-app.put("/api/user", (req, res) => {
-  let id = req.body.id;
-  let name = req.body.name;
-  let email = req.body.email;
-  let password = req.body.password;
-
-  connection.query(
-    "UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?",
-    [name, email, password, id],
-    (err, result, fields) => {
-      if (err) {
-        throw err;
-      }
-
-      res.status(200).json({ msg: "Data updated successfully" });
-    }
-  );
-});
-
-app.delete("/api/user", (req, res) => {
-  let id = req.body.id;
-  connection.query(
-    "DELETE FROM users WHERE id = ?",
-    [id],
-    (err, result, fields) => {
-      if (err) {
-        throw err;
-      }
-
-      res.status(200).json({ msg: "Data deleted successfully" });
     }
   );
 });
