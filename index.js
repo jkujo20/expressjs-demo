@@ -3,6 +3,8 @@ const express = require("express");
 const path = require("path");
 const app = express();
 const mysql = require("mysql");
+const logger = require("./middlewares/logger");
+const auth = require("./middlewares/auth");
 
 const PORT = process.env.PORT || 5000;
 
@@ -19,16 +21,17 @@ connection.connect();
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-
+app.use(logger);
+//app.use(auth);
 
 app.listen(PORT, () => {
   console.log(`Server started in port ${PORT}...`);
 });
 
 // Get Request
-app.get("/api/users", (req, res) => {
-  console.log("Get Users");
-  console.log(`User is admin = ${req.admin}`);
+app.get("/api/users", auth, (req, res) => {
+  console.log("Get Users ");
+  console.log(`Authenticated ${req.authenticated}`);
 
   connection.query("SELECT * FROM users", (err, rows, fields) => {
     if (err) {
